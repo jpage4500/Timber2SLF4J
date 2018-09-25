@@ -5,7 +5,7 @@ import java.io.*;
  */
 public class Timber2SLF4J {
 
-    private static final String TIMBER_IMPORT = "import timber.log.Timber;";
+    private static final String TIMBER_IMPORT = "import timber.log.Timber";
     private static final String TIMBER_D = "Timber.d(";
     private static final String TIMBER_I = "Timber.i(";
     private static final String TIMBER_W = "Timber.w(";
@@ -41,13 +41,18 @@ public class Timber2SLF4J {
             if (file.isDirectory()) {
                 // recursive search
                 findAndReplace(file);
-            } else if (file.getName().endsWith(".java")) {
-                findAndReplaceInFile(file);
+            } else {
+                String fileName = file.getName();
+                if (fileName.endsWith(".java") || fileName.endsWith(".kt")) {
+                    findAndReplaceInFile(file);
+                }
             }
+
         }
     }
 
     private static void findAndReplaceInFile(File file) {
+        boolean isJava = file.getName().endsWith(".java");
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             StringBuilder sb = new StringBuilder();
             boolean hasTimber = false;
@@ -72,7 +77,7 @@ public class Timber2SLF4J {
                     //      import org.slf4j.LoggerFactory;
                     sb.append(LOG_IMPORT1);
                     sb.append(LOG_IMPORT2);
-                } else if (hasTimber && !hasAddedImport && line.contains(" class ")) {
+                } else if (hasTimber && !hasAddedImport && line.contains("class ")) {
                     // NOTE: need to find first instance of "{"
                     while (true) {
                         sb.append(line);
@@ -80,9 +85,15 @@ public class Timber2SLF4J {
                         if (line.contains("{")) {
                             // replace with:
                             //      private static final Logger log = LoggerFactory.getLogger(BaseActivity.class);
-                            sb.append("    private static final Logger log = LoggerFactory.getLogger(");
-                            sb.append(getFileNameOnly(file));
-                            sb.append(".class);\n");
+                            // or:
+                            //      private val log: Logger = LoggerFactory.getLogger(this::class.java)
+                            if (isJava) {
+                                sb.append("    private static final Logger log = LoggerFactory.getLogger(");
+                                sb.append(getFileNameOnly(file));
+                                sb.append(".class);\n");
+                            } else {
+                                sb.append("    private val log: Logger = LoggerFactory.getLogger(this::class.java)\n");
+                            }
                             hasAddedImport = true;
                             break;
                         } else {
