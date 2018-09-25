@@ -73,10 +73,10 @@ public class Timber2SLF4J {
                     sb.append(LOG_IMPORT1);
                     sb.append(LOG_IMPORT2);
                 } else if (hasTimber && !hasAddedImport && line.contains(" class ")) {
-                    sb.append(line);
-                    sb.append('\n');
                     // NOTE: need to find first instance of "{"
                     while (true) {
+                        sb.append(line);
+                        sb.append('\n');
                         if (line.contains("{")) {
                             // replace with:
                             //      private static final Logger log = LoggerFactory.getLogger(BaseActivity.class);
@@ -86,8 +86,6 @@ public class Timber2SLF4J {
                             hasAddedImport = true;
                             break;
                         } else {
-                            sb.append(line);
-                            sb.append('\n');
                             line = br.readLine();
                         }
                     }
