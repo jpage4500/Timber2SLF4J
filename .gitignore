@@ -1,0 +1,10 @@
+.gradle
+build/
+bin/
+.DS_Store
+out/
+
+# Android Studio project files, excluding project code style settings
+.idea/*
+!.idea/codeStyleSettings.xml
+!.idea/codeStyles
