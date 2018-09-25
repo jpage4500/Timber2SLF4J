@@ -66,6 +66,7 @@ public class Timber2SLF4J {
 
                 if (line.startsWith(TIMBER_IMPORT)) {
                     hasTimber = true;
+                    System.out.println("> converting " + file.getName());
                     // replace with:
                     //      import org.slf4j.Logger;
                     //      import org.slf4j.LoggerFactory;
@@ -108,13 +109,13 @@ public class Timber2SLF4J {
                     sb.append(line);
                     sb.append('\n');
                 }
+            }
 
-                if (hasTimber) {
-                    // replace old file with new one
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-                    bw.write(sb.toString());
-                    bw.close();
-                }
+            if (hasTimber) {
+                // replace old file with new one
+                BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+                bw.write(sb.toString());
+                bw.close();
             }
         } catch (Exception e) {
             System.out.println("findAndReplaceInFile: Error reading file: " + file + ", " + e.getMessage());
